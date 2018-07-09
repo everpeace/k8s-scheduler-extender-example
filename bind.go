@@ -10,7 +10,7 @@ type Bind struct {
 }
 
 func (b Bind) Handler(args schedulerapi.ExtenderBindingArgs) *schedulerapi.ExtenderBindingResult {
-	err := b.Func(args.PodName, args.PodName, args.PodUID, args.Node)
+	err := b.Func(args.PodName, args.PodNamespace, args.PodUID, args.Node)
 	return &schedulerapi.ExtenderBindingResult{
 		Error: err.Error(),
 	}
