@@ -27,7 +27,7 @@ you will see `test-pod` will be scheduled by `my-scheduler`.
 ```
 $ kubectl create -f test-pod.yaml
 
-$ kubectl desceribe test-pod
+$ kubectl describe test-pod
 Name:         test-pod
 ...
 Events:
