@@ -46,6 +46,7 @@ data:
       "apiVersion": "v1beta1",
       "filterVerb": "predicates/always_true",
       "prioritizeVerb": "priorities/zero_score",
+      "preemptVerb": "/preemption",
       "bindVerb": "",
       "weight": 1,
       "enableHttps": false,

@@ -114,6 +114,35 @@ func BindRoute(bind Bind) httprouter.Handle {
 	}
 }
 
+func PreemptionRoute(preemption Preemption) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+		checkBody(w, r)
+
+		var buf bytes.Buffer
+		body := io.TeeReader(r.Body, &buf)
+		log.Print("info: extenderPreemptionArgs = ", buf.String())
+
+		var extenderPreemptionArgs schedulerapi.ExtenderPreemptionArgs
+		var extenderPreemptionResult *schedulerapi.ExtenderPreemptionResult
+
+		if err := json.NewDecoder(body).Decode(&extenderPreemptionArgs); err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusBadRequest)
+		} else {
+			extenderPreemptionResult = preemption.Handler(extenderPreemptionArgs)
+		}
+
+		if resultBody, err := json.Marshal(extenderPreemptionResult); err != nil {
+			panic(err)
+		} else {
+			log.Print("info: extenderPreemptionResult = ", string(resultBody))
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			w.Write(resultBody)
+		}
+	}
+}
+
 func VersionRoute(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
 	fmt.Fprint(w, fmt.Sprint(version))
 }
@@ -145,5 +174,13 @@ func AddBind(router *httprouter.Router, bind Bind) {
 		log.Print("warning: AddBind was called more then once!")
 	} else {
 		router.POST(bindPath, DebugLogging(BindRoute(bind), bindPath))
+	}
+}
+
+func AddPreemption(router *httprouter.Router, preemption Preemption) {
+	if handle, _, _ := router.Lookup("POST", preemptionPath); handle != nil {
+		log.Print("warning: AddPreemption was called more then once!")
+	} else {
+		router.POST(preemptionPath, DebugLogging(PreemptionRoute(preemption), preemptionPath))
 	}
 }

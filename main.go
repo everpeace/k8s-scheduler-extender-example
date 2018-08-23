@@ -19,6 +19,7 @@ const (
 	versionPath      = "/version"
 	apiPrefix        = "/scheduler"
 	bindPath         = apiPrefix + "/bind"
+	preemptionPath   = apiPrefix + "/preemption"
 	predicatesPrefix = apiPrefix + "/predicates"
 	prioritiesPrefix = apiPrefix + "/prioritize"
 )
@@ -51,6 +52,16 @@ var (
 	NoBind = Bind{
 		Func: func(podName string, podNamespace string, podUID types.UID, node string) error {
 			return fmt.Errorf("This extender doesn't support Bind.  Please make 'BindVerb' be empty in your ExtenderConfig.")
+		},
+	}
+
+	EchoPreemption = Preemption{
+		Func: func(
+			_ v1.Pod,
+			_ map[string]*schedulerapi.Victims,
+			nodeNameToMetaVictims map[string]*schedulerapi.MetaVictims,
+		) map[string]*schedulerapi.MetaVictims {
+			return nodeNameToMetaVictims
 		},
 	}
 )
