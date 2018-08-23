@@ -1,39 +1,57 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: my-scheduler
+  name: my-scheduler-config
+  namespace: kube-system
+data:
+  config.yaml: |
+    apiVersion: componentconfig/v1alpha1
+    kind: KubeSchedulerConfiguration
+    schedulerName: my-scheduler
+    algorithmSource:
+      policy:
+        configMap:
+          namespace: kube-system
+          name: my-scheduler-policy
+    leaderElection:
+      leaderElect: true
+      lockObjectName: my-scheduler
+      lockObjectNamespace: kube-system
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: my-scheduler-policy
   namespace: kube-system
 data:
  policy.cfg : |
   {
-  "kind" : "Policy",
-  "apiVersion" : "v1",
-  "predicates" : [
-  	{"name" : "PodFitsHostPorts"},
-  	{"name" : "PodFitsResources"},
-  	{"name" : "NoDiskConflict"},
-  	{"name" : "MatchNodeSelector"},
-  	{"name" : "HostName"}
-  	],
-  "priorities" : [
-  	{"name" : "LeastRequestedPriority", "weight" : 1},
-  	{"name" : "BalancedResourceAllocation", "weight" : 1},
-  	{"name" : "ServiceSpreadingPriority", "weight" : 1},
-  	{"name" : "EqualPriority", "weight" : 1}
-  	],
-  "extenders" : [
-  	{
-          "urlPrefix": "http://localhost/scheduler",
-          "apiVersion": "v1beta1",
-          "filterVerb": "predicates/always_true",
-          "bindVerb": "",
-          "prioritizeVerb": "priorities/zero_score",
-          "weight": 1,
-          "enableHttps": false,
-          "nodeCacheCapable": false
-  	}
-      ],
-  "hardPodAffinitySymmetricWeight" : 10
+    "kind" : "Policy",
+    "apiVersion" : "v1",
+    "predicates" : [
+      {"name" : "PodFitsHostPorts"},
+      {"name" : "PodFitsResources"},
+      {"name" : "NoDiskConflict"},
+      {"name" : "MatchNodeSelector"},
+      {"name" : "HostName"}
+    ],
+    "priorities" : [
+      {"name" : "LeastRequestedPriority", "weight" : 1},
+      {"name" : "BalancedResourceAllocation", "weight" : 1},
+      {"name" : "ServiceSpreadingPriority", "weight" : 1},
+      {"name" : "EqualPriority", "weight" : 1}
+    ],
+    "extenders" : [{
+      "urlPrefix": "http://localhost/scheduler",
+      "apiVersion": "v1beta1",
+      "filterVerb": "predicates/always_true",
+      "prioritizeVerb": "priorities/zero_score",
+      "bindVerb": "",
+      "weight": 1,
+      "enableHttps": false,
+      "nodeCacheCapable": false
+    }],
+    "hardPodAffinitySymmetricWeight" : 10
   }
 ---
 apiVersion: apps/v1
@@ -53,22 +71,21 @@ spec:
       labels:
         app: my-scheduler
     spec:
+      volumes:
+      - name: my-scheduler-config
+        configMap:
+          name: my-scheduler-config
       containers:
       - name: my-scheduler-ctr
-        image: gcr.io/google_containers/hyperkube:v1.9.0
+        image: gcr.io/google_containers/hyperkube:v1.11.1
         imagePullPolicy: IfNotPresent
-        command:
-        - sh
-        - -c
-        - |
-          /hyperkube kube-scheduler \
-            --address 0.0.0.0 \
-            --scheduler-name my-scheduler \
-            --policy-configmap-namespace kube-system \
-            --policy-configmap my-scheduler \
-            --lock-object-namespace kube-system \
-            --lock-object-name my-scheduler \
-            -v=4
+        args:
+        - kube-scheduler
+        - --config=/my-scheduler/config.yaml
+        - -v=4
+        volumeMounts:
+        - name: my-scheduler-config
+          mountPath: /my-scheduler
       - name: my-scheduler-extender-ctr
         image: a/b:c
         imagePullPolicy: IfNotPresent

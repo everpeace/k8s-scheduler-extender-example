@@ -2,7 +2,7 @@ package main
 
 import (
 	"k8s.io/api/core/v1"
-	schedulerapi "k8s.io/kubernetes/plugin/pkg/scheduler/api"
+	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 )
 
 type Predicate struct {
@@ -16,7 +16,7 @@ func (p Predicate) Handler(args schedulerapi.ExtenderArgs) *schedulerapi.Extende
 	canNotSchedule := make(map[string]string)
 
 	for _, node := range args.Nodes.Items {
-		result, err := p.Func(pod, node)
+		result, err := p.Func(*pod, node)
 		if err != nil {
 			canNotSchedule[node.Name] = err.Error()
 		} else {

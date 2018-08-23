@@ -2,7 +2,7 @@ package main
 
 import (
 	"k8s.io/api/core/v1"
-	schedulerapi "k8s.io/kubernetes/plugin/pkg/scheduler/api"
+	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 )
 
 type Prioritize struct {
@@ -11,5 +11,5 @@ type Prioritize struct {
 }
 
 func (p Prioritize) Handler(args schedulerapi.ExtenderArgs) (*schedulerapi.HostPriorityList, error) {
-	return p.Func(args.Pod, args.Nodes.Items)
+	return p.Func(*args.Pod, args.Nodes.Items)
 }
