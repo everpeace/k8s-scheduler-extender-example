@@ -21,7 +21,7 @@ const (
 	bindPath         = apiPrefix + "/bind"
 	preemptionPath   = apiPrefix + "/preemption"
 	predicatesPrefix = apiPrefix + "/predicates"
-	prioritiesPrefix = apiPrefix + "/prioritize"
+	prioritiesPrefix = apiPrefix + "/priorities"
 )
 
 var (
