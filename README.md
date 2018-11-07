@@ -6,20 +6,30 @@ This is an example of [Kubernetes Scheduler Extender](https://github.com/kuberne
 ### 1. buid a docker image
 
 ```
-$ docker build . -t YOUR_ORG/YOUR_IMAGE:YOUR_TAG
-$ docker push YOUR_ORG/YOUR_IMAGE:YOUR_TAG
+$ IMAGE=YOUR_ORG/YOUR_IMAGE:YOUR_TAG
+
+$ docker build . -t "${IMAGE}"
+$ docker push "${IMAGE}"
 ```
 
 ### 2. deploy `my-scheduler` in `kube-system` namespace
 please see ConfigMap in [extender.yaml](extender.yaml) for scheduler policy json which includes scheduler extender config.
 
 ```
-# edit extender.yaml to specify your docker image
-$ $EDITOR extender.yaml
-
-# deploy it.
-$ kubectl create -f extender.yaml
+# bring up the kube-scheduler along with the extender image you've just built
+$ sed 's/a\/b:c/'$(echo "${IMAGE}" | sed 's/\//\\\//')'/' extender.yaml | kubectl apply -f -
 ```
+
+For ease of observation, start streaming logs from the extender:
+
+```console
+$ kubectl -n kube-system logs deploy/my-scheduler -c my-scheduler-extender-ctr -f
+[  warn ] 2018/11/07 08:41:40 main.go:84: LOG_LEVEL="" is empty or invalid, fallling back to "INFO".
+[  info ] 2018/11/07 08:41:40 main.go:98: Log level was set to INFO
+[  info ] 2018/11/07 08:41:40 main.go:116: server starting on the port :80
+```
+
+Open up an another termianl and proceed.
 
 ### 3. schedule test pod
 
