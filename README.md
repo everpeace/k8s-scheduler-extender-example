@@ -22,12 +22,13 @@ $ kubectl create -f extender.yaml
 ```
 
 ### 3. schedule test pod
+
 you will see `test-pod` will be scheduled by `my-scheduler`.
 
 ```
 $ kubectl create -f test-pod.yaml
 
-$ kubectl describe test-pod
+$ kubectl describe pod test-pod
 Name:         test-pod
 ...
 Events:
