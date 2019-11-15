@@ -3,7 +3,7 @@ This is an example of [Kubernetes Scheduler Extender](https://github.com/kuberne
 
 ## How to
 
-### 1. buid a docker image
+### 1. build a docker image
 
 ```
 $ IMAGE=YOUR_ORG/YOUR_IMAGE:YOUR_TAG
