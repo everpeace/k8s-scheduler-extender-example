@@ -1,11 +1,31 @@
 apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: my-scheduler
+  namespace: kube-system
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: my-scheduler-cluster-admin
+  namespace: kube-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: cluster-admin
+subjects:
+  - kind: ServiceAccount
+    namespace: kube-system
+    name: my-scheduler
+---
+apiVersion: v1
 kind: ConfigMap
 metadata:
   name: my-scheduler-config
   namespace: kube-system
 data:
   config.yaml: |
-    apiVersion: componentconfig/v1alpha1
+    apiVersion: kubescheduler.config.k8s.io/v1alpha1
     kind: KubeSchedulerConfiguration
     schedulerName: my-scheduler
     algorithmSource:
@@ -71,13 +91,14 @@ spec:
       labels:
         app: my-scheduler
     spec:
+      serviceAccountName: my-scheduler
       volumes:
       - name: my-scheduler-config
         configMap:
           name: my-scheduler-config
       containers:
       - name: my-scheduler-ctr
-        image: gcr.io/google_containers/hyperkube:v1.11.1
+        image: gcr.io/google_containers/hyperkube:v1.16.3
         imagePullPolicy: IfNotPresent
         args:
         - kube-scheduler

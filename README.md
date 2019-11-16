@@ -3,6 +3,14 @@ This is an example of [Kubernetes Scheduler Extender](https://github.com/kuberne
 
 ## How to
 
+### 0. checkout the repo
+
+```shell
+$ git clone git@github.com:everpeace/k8s-scheduler-extender-example.git
+$ cd k8s-scheduler-extender-example
+$ git submodule update --init
+```
+
 ### 1. buid a docker image
 
 ```
