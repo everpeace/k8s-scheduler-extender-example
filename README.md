@@ -3,6 +3,7 @@ This is a repo forked from an [k8s scheduler extender example](https://github.co
 developed by @everpeace. 
 
 We restructured the code to wrap all shared functions and variables into a package `k8s-scheduler-extender`.
+Other referenced  packages including `kubernetes` are copied to `vendor`.
 
 ## Usage
 You can reference the functions and variables by import the package.
