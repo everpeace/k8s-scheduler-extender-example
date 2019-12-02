@@ -8,7 +8,7 @@ Other referenced  packages including `kubernetes` are copied to `vendor`.
 ## Usage
 You can reference the functions and variables by import the package.
 ```golang
-import "github.com/wangchen615/k8s-scheduler-extender-example/k8s-scheduler-extender"
+import "github.com/wangchen615/k8s-scheduler-extender-example/k8s_scheduler_extender"
 ```
 
 The `main.go` is an example extender revised using the above reference.

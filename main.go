@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/wangchen615/k8s-scheduler-extender-example/k8s-scheduler-extender"
+	"github.com/wangchen615/k8s-scheduler-extender-example/k8s_scheduler_extender"
 	"log"
 	"net/http"
 	"os"
