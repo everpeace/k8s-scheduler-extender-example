@@ -12,3 +12,7 @@ import "github.com/wangchen615/k8s-scheduler-extender-example/k8s_scheduler_exte
 ```
 
 The `main.go` is an example extender revised using the above reference.
+
+## Used packages
+The dependency graph of all packages used can be found below.
+![](dep.png)
