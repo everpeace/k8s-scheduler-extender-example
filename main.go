@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/everpeace/k8s-scheduler-extender-example/k8s_scheduler_extender"
 	"log"
 	"net/http"
 	"os"
@@ -15,26 +16,15 @@ import (
 	schedulerapi "k8s.io/kubernetes/pkg/scheduler/api"
 )
 
-const (
-	versionPath      = "/version"
-	apiPrefix        = "/scheduler"
-	bindPath         = apiPrefix + "/bind"
-	preemptionPath   = apiPrefix + "/preemption"
-	predicatesPrefix = apiPrefix + "/predicates"
-	prioritiesPrefix = apiPrefix + "/priorities"
-)
-
 var (
-	version string // injected via ldflags at build time
-
-	TruePredicate = Predicate{
+	TruePredicate = k8s_scheduler_extender.Predicate{
 		Name: "always_true",
 		Func: func(pod v1.Pod, node v1.Node) (bool, error) {
 			return true, nil
 		},
 	}
 
-	ZeroPriority = Prioritize{
+	ZeroPriority = k8s_scheduler_extender.Prioritize{
 		Name: "zero_score",
 		Func: func(_ v1.Pod, nodes []v1.Node) (*schedulerapi.HostPriorityList, error) {
 			var priorityList schedulerapi.HostPriorityList
@@ -49,13 +39,13 @@ var (
 		},
 	}
 
-	NoBind = Bind{
+	NoBind = k8s_scheduler_extender.Bind{
 		Func: func(podName string, podNamespace string, podUID types.UID, node string) error {
 			return fmt.Errorf("This extender doesn't support Bind.  Please make 'BindVerb' be empty in your ExtenderConfig.")
 		},
 	}
 
-	EchoPreemption = Preemption{
+	EchoPreemption = k8s_scheduler_extender.Preemption{
 		Func: func(
 			_ v1.Pod,
 			_ map[string]*schedulerapi.Victims,
@@ -66,26 +56,6 @@ var (
 	}
 )
 
-func StringToLevel(levelStr string) colog.Level {
-	switch level := strings.ToUpper(levelStr); level {
-	case "TRACE":
-		return colog.LTrace
-	case "DEBUG":
-		return colog.LDebug
-	case "INFO":
-		return colog.LInfo
-	case "WARNING":
-		return colog.LWarning
-	case "ERROR":
-		return colog.LError
-	case "ALERT":
-		return colog.LAlert
-	default:
-		log.Printf("warning: LOG_LEVEL=\"%s\" is empty or invalid, fallling back to \"INFO\".\n", level)
-		return colog.LInfo
-	}
-}
-
 func main() {
 	colog.SetDefaultLevel(colog.LInfo)
 	colog.SetMinLevel(colog.LInfo)
@@ -94,24 +64,24 @@ func main() {
 		Flag:   log.Ldate | log.Ltime | log.Lshortfile,
 	})
 	colog.Register()
-	level := StringToLevel(os.Getenv("LOG_LEVEL"))
+	level := k8s_scheduler_extender.StringToLevel(os.Getenv("LOG_LEVEL"))
 	log.Print("Log level was set to ", strings.ToUpper(level.String()))
 	colog.SetMinLevel(level)
 
 	router := httprouter.New()
-	AddVersion(router)
+	k8s_scheduler_extender.AddVersion(router)
 
-	predicates := []Predicate{TruePredicate}
+	predicates := []k8s_scheduler_extender.Predicate{TruePredicate}
 	for _, p := range predicates {
-		AddPredicate(router, p)
+		k8s_scheduler_extender.AddPredicate(router, p)
 	}
 
-	priorities := []Prioritize{ZeroPriority}
+	priorities := []k8s_scheduler_extender.Prioritize{ZeroPriority}
 	for _, p := range priorities {
-		AddPrioritize(router, p)
+		k8s_scheduler_extender.AddPrioritize(router, p)
 	}
 
-	AddBind(router, NoBind)
+	k8s_scheduler_extender.AddBind(router, NoBind)
 
 	log.Print("info: server starting on the port :80")
 	if err := http.ListenAndServe(":80", router); err != nil {

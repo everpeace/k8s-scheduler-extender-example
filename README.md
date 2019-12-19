@@ -3,12 +3,12 @@ This is an example of [Kubernetes Scheduler Extender](https://github.com/kuberne
 
 ## How to
 
-### 0. checkout the repo
+### 0. checkout the repo and make sure you have [`dep` installed](https://golang.github.io/dep/docs/installation.html).
 
 ```shell
 $ git clone git@github.com:everpeace/k8s-scheduler-extender-example.git
 $ cd k8s-scheduler-extender-example
-$ git submodule update --init
+$ dep ensure
 ```
 
 ### 1. buid a docker image
@@ -60,6 +60,16 @@ Events:
   Normal  Started                8s    kubelet, minikube  Started container
 ```
 
+## Code changes
+@wangchen615 helped 
+- restructure the code to wrap all shared functions and variables into a package `k8s-scheduler-extender`.
+- use `dep` instead of `mod` to manage dependencies
+
+### Use of the package `k8s-scheduler-extender`
+```
+import "github.com/everpeace/k8s-scheduler-extender-example/k8s_scheduler_extender"
+```
+The `main.go` is an example extender revised using the above reference.
 
 ## License
 
@@ -78,3 +88,8 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 ```
+
+
+## Used packages
+The dependency graph of all packages used can be found below.
+![](dep.png)

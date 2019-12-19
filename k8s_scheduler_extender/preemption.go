@@ -1,4 +1,4 @@
-package main
+package k8s_scheduler_extender
 
 import (
 	"k8s.io/api/core/v1"
