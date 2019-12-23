@@ -8,7 +8,6 @@ ENV GOARCH=amd64
 
 # build
 WORKDIR /go/src/k8s-scheduler-extender-example
-COPY kubernetes kubernetes
 COPY go.mod .
 COPY go.sum .
 RUN GO111MODULE=on go mod download
