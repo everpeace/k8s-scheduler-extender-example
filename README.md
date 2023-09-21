@@ -1,5 +1,5 @@
 # k8s-scheduler-extender-example
-This is an example of [Kubernetes Scheduler Extender](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/scheduling/scheduler_extender.md)
+This is an example of [Kubernetes Scheduler Extender](https://github.com/kubernetes/enhancements/tree/5320deb4834c05ad9fb491dcd361f952727ece3e/keps/sig-scheduling/1819-scheduler-extender#bind)
 
 ## How to
 
